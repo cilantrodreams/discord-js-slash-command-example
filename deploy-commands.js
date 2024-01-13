@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 // Grab all command folders paths
-const commands = []
+const commands = [];
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -25,5 +25,19 @@ for (const folder of commandFolders) {
 }
 
 // construct instance of rest module
+const rest = new REST().setToken(token);
 
 // deploy commands with rest module
+(async () => {
+    try {
+        console.log(`Started refreshing ${commands.length} application (/) commands.`);
+        // put command used to fully refresh commands in guild with current set
+        const data = await rest.put(
+            Routes.applicationGuildCommands(clientId, guildId),
+            { body: commands},
+        );
+        console.log(`Successfully reload ${data.length} application (/) commands.`);
+    } catch (error) {
+        console.error(error);
+    }
+})();
